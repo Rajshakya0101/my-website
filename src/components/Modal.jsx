@@ -6,7 +6,7 @@ const Modal = ({ isOpen, onClose, onSubmit, successMessage }) => {
   const [projectData, setProjectData] = useState({
     name: "",
     description: "",
-    techStack: "",
+    techStack: [], // Change this to an array to store multiple tech stack items
     link: "",
     thumbnailUrl: "",
   });
@@ -20,6 +20,25 @@ const Modal = ({ isOpen, onClose, onSubmit, successMessage }) => {
       ...projectData,
       [name]: value,
     });
+  };
+
+  const handleTechStackChange = (e, index) => {
+    const { value } = e.target;
+    const newTechStack = [...projectData.techStack];
+    newTechStack[index] = value;
+    setProjectData({ ...projectData, techStack: newTechStack });
+  };
+
+  const addTechStackItem = () => {
+    setProjectData({
+      ...projectData,
+      techStack: [...projectData.techStack, ""], // Add an empty string to the tech stack array
+    });
+  };
+
+  const removeTechStackItem = (index) => {
+    const newTechStack = projectData.techStack.filter((_, i) => i !== index);
+    setProjectData({ ...projectData, techStack: newTechStack });
   };
 
   const handleFileChange = (e) => {
@@ -55,7 +74,7 @@ const Modal = ({ isOpen, onClose, onSubmit, successMessage }) => {
       setProjectData({
         name: "",
         description: "",
-        techStack: "",
+        techStack: [],
         link: "",
         thumbnailUrl: "",
       }); // Clear form after submit
@@ -110,15 +129,34 @@ const Modal = ({ isOpen, onClose, onSubmit, successMessage }) => {
               className="w-full p-2 mb-2 border border-gray-300 rounded"
               required
             />
-            <input
-              type="text"
-              name="techStack"
-              value={projectData.techStack}
-              onChange={handleInputChange}
-              placeholder="Tech Stack"
-              className="w-full p-2 mb-2 border border-gray-300 rounded"
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium mb-2">Tech Stack</label>
+              {projectData.techStack.map((tech, index) => (
+                <div key={index} className="flex mb-2">
+                  <input
+                    type="text"
+                    value={tech}
+                    onChange={(e) => handleTechStackChange(e, index)}
+                    placeholder="Tech Stack"
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeTechStackItem(index)}
+                    className="ml-2 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addTechStackItem}
+                className="text-blue-500"
+              >
+                Add Tech Stack
+              </button>
+            </div>
             <input
               type="url"
               name="link"
