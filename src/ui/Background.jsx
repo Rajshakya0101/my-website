@@ -1,65 +1,65 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-const RainDropEffect = ({ children }) => {
-  const [droplets, setDroplets] = useState([]);
+const SnowfallEffect = ({ children }) => {
+  const [snowflakes, setSnowflakes] = useState([]);
 
-  // Generate droplets at regular intervals
   useEffect(() => {
     const interval = setInterval(() => {
-      setDroplets((prevDroplets) => [
-        ...prevDroplets,
-        createDroplet(), // Add a new droplet every interval
+      setSnowflakes((prev) => [
+        ...prev,
+        createSnowflake(), // Add new snowflake every 300ms
       ]);
-    }, 1000); // Add new droplets every 100ms
+    }, 300);
 
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Create a droplet with random size, speed, and starting position
-  const createDroplet = () => {
-    return {
-      id: Math.random(),
-      x: Math.random() * window.innerWidth, // Random horizontal position
-      y: -30, // Start off-screen above the top
-      size: Math.random() * 3 + 2, // Random size for droplets
-      duration: Math.random() * 2 + 3, // Random falling duration between 3 and 5 seconds
-    };
-  };
+  const createSnowflake = () => ({
+    id: Math.random(),
+    x: Math.random() * window.innerWidth,
+    y: -30,
+    size: Math.random() * 5 + 2, // Size between 2-7px
+    duration: Math.random() * 5 + 5, // Duration between 5-10s
+    drift: Math.random() * 50 - 25, // Horizontal drift variation
+    rotate: Math.random() * 360, // Random initial rotation
+  });
 
   return (
-    <div
-      className="h-screen w-full relative overflow-hidden bg-gradient-to-b from-gray-900 to-black"
-    >
-      {droplets.map((droplet) => (
-        <RainDroplet key={droplet.id} droplet={droplet} />
+    <div className="h-screen w-full relative overflow-hidden bg-gradient-to-b from-gray-900 to-black">
+      {snowflakes.map((snowflake) => (
+        <Snowflake key={snowflake.id} snowflake={snowflake} />
       ))}
       {children}
     </div>
   );
 };
 
-const RainDroplet = ({ droplet }) => {
+const Snowflake = ({ snowflake }) => {
   return (
     <motion.div
-      className="absolute bg-blue-500 rounded-full opacity-80"
+      className="absolute bg-white rounded-full"
       style={{
-        width: `${droplet.size}px`,
-        height: `${droplet.size}px`,
-        left: `${droplet.x}px`,
+        width: `${snowflake.size}px`,
+        height: `${snowflake.size}px`,
+        left: `${snowflake.x}px`,
+        top: `${snowflake.y}px`,
+        filter: "blur(1px)",
       }}
       animate={{
-        y: [droplet.y, window.innerHeight + 50], // Droplet falls downwards
-        opacity: [1, 0], // Fade out as it falls
+        y: window.innerHeight + 50,
+        x: snowflake.x + snowflake.drift,
+        rotate: snowflake.rotate + 360,
+        opacity: [1, 0.8, 0],
       }}
       transition={{
-        duration: droplet.duration, // Randomize the fall duration
-        repeat: Infinity, // Keep the droplet falling
-        ease: "easeIn", // Ease-in effect for smooth falling
+        duration: snowflake.duration,
+        repeat: Infinity,
+        ease: "linear",
       }}
     />
   );
 };
 
-export default RainDropEffect;
+export default SnowfallEffect;
